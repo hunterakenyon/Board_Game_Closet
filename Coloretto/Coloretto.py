@@ -32,44 +32,55 @@ class GameState:
     def __init__(self, num_players):
         self.turn = 0
         self.playRound()
-        self.num_players = num_players
-        self.deck = board.deck
         
     def newRound(self):
         return
     
     def printStatus(self):
+        print("Starting new round", players.out)
         return
     
     def playRound(self):
         
         while board.lastRound == False:
-            
+
             self.newRound()
             
-            while any(players.out):
+            while not all(players.out):
                 
-                self.turn = (self.turn + 1) % self.num_players
+                self.turn = (self.turn + 1) % num_players
                 
                 action = input("Would you like to take a pile or draw a card? \n").lower()
                 if action == "draw":
                     
-                    topcard = self.deck.pop()
-                    placement = int(input("Which pile would you like to place the card in?\n"))
-                    
-                    return
+                    topcard = board.deck.pop()
+
+                    self.placeCard(topcard)
+
+                    print(board.field)
+
                 elif action == "take":
-                    return
-                
-                topcard = self.deck.pop()
-                
-                pass
-            
-            
+                    pass                
         
         return
-    
-    
+
+
+    def placeCard(self, topcard):
+        valid = []
+        for i in range(len(board.field)):
+            if len(board.field[i]) < 3:
+                valid.append(i)
+        while True:
+            placement = int(input("Enter an pile to place "+ str(topcard) +": \nValid locations are "+ str(valid)+"\n"))
+            if placement in valid:
+                board.field[placement].append(topcard)
+                break
+            else:
+                print("That pile is not available, please choose again.")
+
+    def takeCard(self):
+        pass
+
 
 num_players = 4
 
