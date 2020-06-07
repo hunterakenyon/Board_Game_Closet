@@ -37,32 +37,49 @@ class GameState:
     
     def __init__(self, num_players):
         self.currentPlayer = 0
-        self.playRound()
+        self.lastOut = 0
+        self.playRound(num_players)
         
-    def newRound(self):
-        return
+    def newRound(self, num_players):
+        board.field = [[] for n in range(num_players)]
+        players.out = [False for n in range(num_players)]
+        self.currentPlayer = self.lastOut - 1
+        
     
     def printStatus(self):
         print("Starting new round", players.out)
         return
     
-    def playRound(self):
+    def playRound(self, num_players):
         
         while board.lastRound == False:
 
-            self.newRound()
+            self.newRound(num_players)
             
             while not all(players.out):
                 self.currentPlayer = (self.currentPlayer + 1) % num_players
-                
-                while True:
-                    try:
+                if players.out[self.currentPlayer]:
+                    continue
+                fieldSize = [len(n) for n in board.field]
+                #print(board.field[0], board.field.count(board.field[0]), len(board.field))
+                if len(board.field[0]) == 3 and fieldSize.count(fieldSize[0]) == len(board.field):
+
+                    for i in range(len(board.field)):
+                        print(i, board.field[i])
+
+                    self.takePile()
+
+                else:                                       
+                    while True:
                         action = input("Would you like to take a pile or draw a card? \n").lower()
                         if action == "draw":
-                            
+                            if len(board.deck) == 15:
+                                print("Last turn!")
+                                board.lastRound = True
                             topcard = board.deck.pop()
                             self.placeCard(topcard)
                             print(board.field)
+                            break
 
                         elif action == "take":
 
@@ -70,9 +87,10 @@ class GameState:
                                 print(i, board.field[i])
 
                             self.takePile()
-                    except:
-                        print("Please enter \"draw\" or \"take\".")       
-        
+                            break
+                        else:
+                            print("Please enter \"draw\" or \"take\".")
+
         return
 
 
@@ -83,7 +101,7 @@ class GameState:
                 valid.append(i)
         while True:
             try:
-                placement = int(input("Enter an pile to place "+ str(topcard) +": \nValid locations are "+ str(valid)+"\n"))
+                placement = int(input("Enter a pile to place "+ str(topcard) +": \nValid locations are "+ str(valid)+"\n"))
                 if placement in valid:
                     board.field[placement].append(topcard)
                     break
@@ -98,12 +116,13 @@ class GameState:
                 players.out[self.currentPlayer] = True
                 selection = board.field.pop(pile)
                 for card in selection:
-                    players.claims[self.currentPlayer][card] += 1
+                   # players.claims[self.currentPlayer][card] += 1
+                    players.add_card(self.currentPlayer,card)
+                self.lastOut = self.currentPlayer
                 break
             else:
                 print("That is not a valid pile. Please choose again.")
 
-        pass
 
 
 num_players = 4
