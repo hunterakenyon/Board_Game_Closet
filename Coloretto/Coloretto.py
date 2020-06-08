@@ -17,7 +17,7 @@ class BoardState:
                 except:
                     print("Please enter a valid option. ")
             self.aux_deck.remove(card)
-            players.add_card(x, card)
+            players.add_card(card, x)
         self.deck += self.aux_deck
         random.shuffle(self.deck)
         
@@ -25,12 +25,12 @@ class BoardState:
 class PlayerState:
     
     def __init__(self, num_players):
-        self.claims = {x:{y:0 for y in range(1,10)} for x in range(num_players)}
+        self.claims = {x:[0 for y in range(num_players)] for x in range (1,10)}
         self.out = [False for x in range(num_players)]
         self.score = [0 for x in range (num_players)]
         
-    def add_card(self, player, card):
-        self.claims[player][card] += 1
+    def add_card(self, card, player):
+        self.claims[card][player] += 1
         
         
 class GameState:
@@ -46,9 +46,12 @@ class GameState:
         self.currentPlayer = self.lastOut - 1
         
     
-    def printStatus(self):
-        print("Starting new round", players.out)
-        return
+    def printStatus(self, func):
+        if func == "board":
+            pass
+        elif func == "score":
+            pass
+        
     
     def playRound(self, num_players):
         
@@ -60,6 +63,7 @@ class GameState:
                 self.currentPlayer = (self.currentPlayer + 1) % num_players
                 if players.out[self.currentPlayer]:
                     continue
+                print("Current player: " + str(self.currentPlayer))
                 fieldSize = [len(n) for n in board.field]
                 #print(board.field[0], board.field.count(board.field[0]), len(board.field))
                 if len(board.field[0]) == 3 and fieldSize.count(fieldSize[0]) == len(board.field):
@@ -91,6 +95,8 @@ class GameState:
                         else:
                             print("Please enter \"draw\" or \"take\".")
 
+                print("##########################\n##########################")
+
         return
 
 
@@ -110,19 +116,20 @@ class GameState:
 
     def takePile(self):
         valid = [n for n in range(len(board.field))]
-        while True:
-            pile = int(input("Select which pile you would like to take: \nValid piles are " + str(valid) +"\n"))
-            if pile in valid:
-                players.out[self.currentPlayer] = True
-                selection = board.field.pop(pile)
-                for card in selection:
-                   # players.claims[self.currentPlayer][card] += 1
-                    players.add_card(self.currentPlayer,card)
-                self.lastOut = self.currentPlayer
-                break
-            else:
-                print("That is not a valid pile. Please choose again.")
-
+        try:
+            while True:
+                pile = int(input("Select which pile you would like to take: \nValid piles are " + str(valid) +"\n"))
+                if pile in valid:
+                    players.out[self.currentPlayer] = True
+                    selection = board.field.pop(pile)
+                    for card in selection:
+                    # players.claims[self.currentPlayer][card] += 1
+                        players.add_card(card, self.currentPlayer)
+                    self.lastOut = self.currentPlayer
+                    break
+                else:
+                    print("That is not a valid pile. Please choose again.")
+        except: print("That is not a valid pile. Please choose again.")
 
 
 num_players = 4
