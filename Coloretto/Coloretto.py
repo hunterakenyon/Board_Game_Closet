@@ -46,9 +46,13 @@ class GameState:
         self.currentPlayer = self.lastOut - 1
         
     
-    def printStatus(self, func):
+    def printStatus(self ,num_players , func):
         if func == "board":
-            pass
+            print ('%8s %8s %8s %8s %8s %8s %8s %8s %8s %8s %8s' % ("Player", "Orange", "Blue", "Brown", "Yellow", "Purple", "Green", "Red", "+2", "Wild", "Score"))
+            for i in range(num_players):
+                print ('%8s %8s %8s %8s %8s %8s %8s %8s %8s %8s %8s' % ("Player " + str(i), players.claims[1][i], players.claims[2][i], players.claims[3][i], players.claims[4][i], players.claims[5][i], players.claims[6][i], players.claims[7][i], players.claims[8][i], players.claims[9][i], 0))
+
+
         elif func == "score":
             pass
         
@@ -63,6 +67,7 @@ class GameState:
                 self.currentPlayer = (self.currentPlayer + 1) % num_players
                 if players.out[self.currentPlayer]:
                     continue
+                self.printStatus(num_players, func="board")
                 print("Current player: " + str(self.currentPlayer))
                 fieldSize = [len(n) for n in board.field]
                 #print(board.field[0], board.field.count(board.field[0]), len(board.field))
