@@ -1,4 +1,5 @@
 import random
+import copy
 
 class BoardState:
     
@@ -39,6 +40,7 @@ class GameState:
         self.currentPlayer = 0
         self.lastOut = 0
         self.playRound(num_players)
+        self.finalScore()
         
     def newRound(self, num_players):
         board.field = [[] for n in range(num_players)]
@@ -47,16 +49,14 @@ class GameState:
         
     
     def printStatus(self ,num_players , func):
+
+        current_score = self.calcScores(players.claims, num_players)
+
         if func == "board":
             print ('%8s %8s %8s %8s %8s %8s %8s %8s %8s %8s %8s' % ("Player", "Orange", "Blue", "Brown", "Yellow", "Purple", "Green", "Red", "+2", "Wild", "Score"))
             for i in range(num_players):
-                print ('%8s %8s %8s %8s %8s %8s %8s %8s %8s %8s %8s' % ("Player " + str(i), players.claims[1][i], players.claims[2][i], players.claims[3][i], players.claims[4][i], players.claims[5][i], players.claims[6][i], players.claims[7][i], players.claims[8][i], players.claims[9][i], 0))
-
-
-        elif func == "score":
-            pass
+                print ('%8s %8s %8s %8s %8s %8s %8s %8s %8s %8s %8s' % ("Player " + str(i), players.claims[1][i], players.claims[2][i], players.claims[3][i], players.claims[4][i], players.claims[5][i], players.claims[6][i], players.claims[7][i], players.claims[8][i], players.claims[9][i], current_score[i]))
         
-    
     def playRound(self, num_players):
         
         while board.lastRound == False:
@@ -101,7 +101,6 @@ class GameState:
                             print("Please enter \"draw\" or \"take\".")
 
                 print("##########################\n##########################")
-
         return
 
 
@@ -136,6 +135,45 @@ class GameState:
                     print("That is not a valid pile. Please choose again.")
         except: print("That is not a valid pile. Please choose again.")
 
+    def calcScores(self, scores, num_players):
+        scoring = {0:0,
+                1:1,
+                2:3,
+                3:6,
+                4:10,
+                5:15,
+                6:21,
+                7:21,
+                8:21,
+                9:21}
+        
+        total = [0 for x in range(num_players)]
+        tmp_scores = copy.deepcopy(scores)
+        for j in range(num_players):
+            colors = [0 for x in range(7)]
+            for i in range(1,8):
+                colors[i-1] += tmp_scores[i][j]
+            for i in range(8,9):
+                total[j] += 2*tmp_scores[i][j]
+            colors.sort(reverse=True)
+            for i in range(9,10):
+                while tmp_scores[i][j] > 0:
+                    for x in range(7):
+                        if colors[x] < 6:
+                            colors[x] += 1
+                            tmp_scores[i][j] -= 1
+            for x in range(7):
+                if x < 3:
+                    total[j] += scoring[colors[x]]
+                else:
+                    total[j] -= scoring[colors[x]]
+        return total
+
+    def finalScore(self):
+        final = self.calcScores(players.claims, num_players)
+        print('%8s %6s' % ("Player", "Score"))
+        for each in range(len(final)):
+            print('%8s %6s' % ("Player " + str(each), str(final[each])))
 
 num_players = 4
 
